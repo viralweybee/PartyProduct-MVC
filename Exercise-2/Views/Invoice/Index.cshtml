@@ -1,0 +1,86 @@
+﻿
+@model Exercise_2.Models.Invoice
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+@*Generating a Invoice table*@ 
+@using (Html.BeginForm())
+{
+<div class="container">
+    <div class="form-group">
+        @if (ViewBag.list1 != null)
+        {
+            <label>
+                Party
+            </label>
+            @Html.DropDownListFor(model => model.PartyId, ViewBag.list1 as SelectList, "--select Party", new { @class = "form-control" })
+        }
+    </div>
+    <div class="form-group">
+        <label>
+            Product
+        </label>
+        @Html.DropDownListFor(model => model.ProductId, new SelectList(" "), "--select Product", new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label>
+            Rate
+        </label>
+        @Html.TextBoxFor(m => m.rate, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        <label>
+            date
+        </label>
+        @Html.TextBoxFor(m => m.time, new { @class = "form-control" })
+    </div>
+          
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input id="submit-btn" type="submit" value="Save" class="btn btn-success" />
+        </div>
+    </div>
+</div> 
+}
+
+
+
+@*Display Invoice List*@
+    <div>
+        @Html.ActionLink("DisplayInvoice", "DisplayInvoice")
+    </div>
+
+
+
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+@*For Rendering on party change data*@
+<script>
+    $(document).ready(function () {
+        $("#PartyId").change(function () {
+            $.get("/Invoice/ProductList", { id: $("#PartyId").val() }, function (data) {
+                $("#ProductId").empty();
+                $("#ProductId").append("<option value=--Select Party-->Select</option");
+                $.each(data, function (index, row) {
+                    $("#ProductId").append("<option value='" + row.id + "'>" + row.pr_name + "</option>")
+                })
+            })
+        })
+@*Rendering on product change data*@
+        $("#ProductId").change(function () {
+            $.get("/Invoice/Rate", { id: $("#ProductId").val() }, function (data) {
+                $("#rate").empty();
+                $("#rate").val(data);
+            })
+        })
+        $("#submit-btn").click(function () {
+            $.get("/Invoice/ViewInvoice", function (data) {
+                console.log(data);
+            })
+        })
+    })
+</script>

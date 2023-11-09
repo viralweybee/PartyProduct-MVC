@@ -1,0 +1,38 @@
+﻿@model IEnumerable<Exercise_2.Models.Invoice>
+@{
+    ViewBag.Title = "DisplayInvoice";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>DisplayInvoice</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>PartyName</th>
+            <th>ProductName</th>
+            <th>Rate</th>
+            <th>time</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        @foreach (var items in Model)
+        {
+            <tr>
+                <td> @Html.DisplayFor(modelItem => items.Party.p_name)</td>
+                <td>@Html.DisplayFor(modelItem => items.Product.pr_name)</td>
+                <td>@Html.DisplayFor(modelItem => items.rate)</td>
+                <td>@Html.DisplayFor(modelItem => items.time)</td>
+            </tr>
+        }
+        
+    </tbody>
+</table>
+@using (Html.BeginForm("Close", "Invoice"))
+{
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Close" class="btn btn-danger" />
+        </div>
+    </div>
+}
