@@ -15,6 +15,7 @@ namespace Exercise_2.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Assigns
+        [Authorize]
         public ActionResult Index()
         {
             var assigns = db.assigns.Include(a => a.Party).Include(a => a.Product);
@@ -22,6 +23,7 @@ namespace Exercise_2.Controllers
         }
 
         // GET: Assigns/Details/5
+        [Authorize]
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -37,6 +39,7 @@ namespace Exercise_2.Controllers
         }
 
         // GET: Assigns/Create
+        [Authorize]
         public ActionResult Create()
         {
             ViewBag.PartyId = new SelectList(db.parties, "id", "p_name");
@@ -62,6 +65,7 @@ namespace Exercise_2.Controllers
         }
 
         // GET: Assigns/Edit/5
+        [Authorize]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -94,6 +98,7 @@ namespace Exercise_2.Controllers
             return View(assign);
         }
 
+        [Authorize]
         // GET: Assigns/Delete/5
         public ActionResult Delete(int? id)
         {

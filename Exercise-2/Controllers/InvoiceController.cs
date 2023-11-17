@@ -11,48 +11,59 @@ namespace Exercise_2.Controllers
     public class InvoiceController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
-        // GET: Invoice
 
+        // GET: Invoice
+        [Authorize]
         public ActionResult Index()
         {
             var list = db.parties.ToList();
             ViewBag.list1 = new SelectList(list, "id", "p_name");
+
+            var dataInvoices = DataInvoice();
+         
+            var model = new BindInvoice();
+            model.listinvoice = dataInvoices;
+            
+            return View(model);
+        }
+        //Post : Invoice
+        [HttpPost]
+        public ActionResult Index( BindInvoice invoice)
+        {
+
+            if (ModelState.IsValid)
+            {
+                var pId = Convert.ToInt32(invoice.simpleinvoice.Party.p_name);
+                var prId = Convert.ToInt32(invoice.simpleinvoice.Product.pr_name);
+                var party = db.parties.Single(x => x.id == pId);
+                var product = db.products.Single(x => x.id == prId);
+                Invoice i = new Invoice()
+                {
+                    rate = invoice.simpleinvoice.rate,
+                    quantity = invoice.simpleinvoice.quantity,
+                    Party = party,
+                    Product = product
+                };
+                db.invoices.Add(i);
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            var inoviceData = db.invoices.Include(a => a.Party).Include(a => a.Product).ToList();
+            var list = db.parties.ToList();
+            ViewBag.list1 = new SelectList(list, "id", "p_name");
             return View();
         }
+        //Close : Invoice 
+        //Delete all data of particular party and starting with new party
         [HttpPost]
-        public ActionResult Index([Bind(Include = "id,PartyId,ProductId,rate,time")] Invoice invoice)
-        {
-            if (ModelState.IsValid)
-            {
-                db.invoices.Add(invoice);
-                db.SaveChanges();
-            }
-            var inoviceData = db.invoices.Include(a => a.Party).Include(a => a.Product).ToList();
-            return View(inoviceData);
-        }
-        [HttpGet]
-        public ActionResult DisplayInvoice()
-        {
-            var inoviceData = db.invoices.Include(a => a.Party).Include(a => a.Product).ToList();
-            return View(inoviceData);
-        }
-        [HttpPost]
-        public ActionResult DisplayInvoice([Bind(Include = "id,PartyId,ProductId,rate,time")] Invoice invoice)
-        {   
-            if (ModelState.IsValid)
-            {
-                db.invoices.Add(invoice);
-                db.SaveChanges();
-            }
-            var inoviceData = db.invoices.Include(a => a.Party).Include(a => a.Product).ToList();
-            return View(inoviceData);
-        }
         public ActionResult Close(Invoice invoice)
         {
-            /*db.invoices.Remove(invoice);
-            db.SaveChanges();*/
-            return View("DisplayInvoice");
+            db.invoices.RemoveRange(db.invoices);
+            db.SaveChanges();
+            return RedirectToAction("Index");
         }
+        //Ajax Call
+        //Onchange of Party also change a product List
         public JsonResult ProductList(int id)
         {
             db.Configuration.ProxyCreationEnabled = false;
@@ -63,22 +74,18 @@ namespace Exercise_2.Controllers
            
             return Json(productDetails, JsonRequestBehavior.AllowGet);
         }
+        //Ajax Call of Rate
+        //OnChange of Product Display latest date of rate for particular product
         public JsonResult Rate(int id)
         {
             db.Configuration.ProxyCreationEnabled = false;
             var productRate = (from p in db.product_Rates where p.Pr_id == id orderby p.date descending select p.rate).First();
             return Json(productRate, JsonRequestBehavior.AllowGet);
-        }
-        public JsonResult ViewInvoice()
-        {
-            db.Configuration.ProxyCreationEnabled = false;
 
-            var list1 = (from a in db.invoices
-                         select new
-                         {
-                             a.id, a.Party.p_name, a.Product.pr_name, a.rate, a.time
-                         }).ToList();
-            return Json(list1, JsonRequestBehavior.AllowGet);
+        }
+        private List<Invoice> DataInvoice()
+        {
+            return db.invoices.Include(a => a.Party).Include(a => a.Product).ToList();
         }
     }
 }

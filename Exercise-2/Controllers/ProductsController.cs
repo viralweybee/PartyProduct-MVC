@@ -15,12 +15,14 @@ namespace Exercise_2.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Products
+        [Authorize]
         public ActionResult Index()
         {
             return View(db.products.ToList());
         }
 
         // GET: Products/Details/5
+        [Authorize]
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -36,6 +38,7 @@ namespace Exercise_2.Controllers
         }
 
         // GET: Products/Create
+        [Authorize]
         public ActionResult Create()
         {
             return View();
@@ -59,6 +62,7 @@ namespace Exercise_2.Controllers
         }
 
         // GET: Products/Edit/5
+        [Authorize]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -90,6 +94,7 @@ namespace Exercise_2.Controllers
         }
 
         // GET: Products/Delete/5
+        [Authorize]
         public ActionResult Delete(int? id)
         {
             if (id == null)

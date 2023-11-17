@@ -15,12 +15,39 @@ namespace Exercise_2.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Parties
-        public ActionResult Index()
+        [Authorize]
+        public ActionResult Index(string sortOrder,string searchString)
         {
-            return View(db.parties.ToList());
+            var parties = from p in db.parties select p;
+            
+            //searching functionalites
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                parties = parties.Where(s => s.p_name.Contains(searchString)||s.p_name.Contains(searchString));
+            }
+            //sorting functionalites
+            ViewBag.NameSortParm = sortOrder =="name_asc" ?"name_desc" : "name_asc";
+            ViewBag.IdSort = String.IsNullOrEmpty(sortOrder) ? "id_asc" : "";
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    parties = parties.OrderByDescending(p => p.p_name);
+                    break;
+                case "name_asc":
+                    parties = parties.OrderBy(p => p.p_name);
+                    break;
+                case "id_asc":
+                    parties = parties.OrderBy(p => p.id);
+                    break;
+                default:
+                    parties = parties.OrderBy(p => p.id);
+                    break;
+            }
+            return View(parties.ToList());
         }
 
         // GET: Parties/Details/5
+        [Authorize]
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -36,6 +63,7 @@ namespace Exercise_2.Controllers
         }
 
         // GET: Parties/Create
+        [Authorize]
         public ActionResult Create()
         {
             return View();
@@ -57,6 +85,7 @@ namespace Exercise_2.Controllers
         }
 
         // GET: Parties/Edit/5
+        [Authorize]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -86,6 +115,7 @@ namespace Exercise_2.Controllers
         }
 
         // GET: Parties/Delete/5
+        [Authorize]
         public ActionResult Delete(int? id)
         {
             if (id == null)

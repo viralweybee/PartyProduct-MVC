@@ -15,6 +15,7 @@ namespace Exercise_2.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Product_Rate
+        [Authorize]
         public ActionResult Index()
         {
             var product_Rates = db.product_Rates.Include(p => p.Product);
@@ -22,6 +23,7 @@ namespace Exercise_2.Controllers
         }
 
         // GET: Product_Rate/Details/5
+        [Authorize]
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -37,6 +39,7 @@ namespace Exercise_2.Controllers
         }
 
         // GET: Product_Rate/Create
+        [Authorize]
         public ActionResult Create()
         {
             ViewBag.Pr_id = new SelectList(db.products, "id", "pr_name");
@@ -62,6 +65,7 @@ namespace Exercise_2.Controllers
         }
 
         // GET: Product_Rate/Edit/5
+        [Authorize]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -95,6 +99,7 @@ namespace Exercise_2.Controllers
         }
 
         // GET: Product_Rate/Delete/5
+        [Authorize]
         public ActionResult Delete(int? id)
         {
             if (id == null)

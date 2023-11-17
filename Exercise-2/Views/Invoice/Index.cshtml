@@ -1,5 +1,5 @@
 ﻿
-@model Exercise_2.Models.Invoice
+@model Exercise_2.Models.BindInvoice
 
 @{
     ViewBag.Title = "Index";
@@ -7,79 +7,113 @@
 }
 
 <h2>Index</h2>
-@*Generating a Invoice table*@ 
+
+@*Generating a Invoice table*@
+
 @using (Html.BeginForm())
 {
-<div class="container">
-    <div class="form-group">
-        @if (ViewBag.list1 != null)
-        {
+    <div class="container">
+        <div class="form-group">
+            @if (ViewBag.list1 != null)
+            {
+                <label>
+                    Party
+                </label>
+                @Html.DropDownListFor(item => item.simpleinvoice.Party.p_name, ViewBag.list1 as SelectList, "--select Party", new { @class = "form-control" })
+            }
+        </div>
+        <div class="form-group">
             <label>
-                Party
+                Product
             </label>
-            @Html.DropDownListFor(model => model.PartyId, ViewBag.list1 as SelectList, "--select Party", new { @class = "form-control" })
-        }
-    </div>
-    <div class="form-group">
-        <label>
-            Product
-        </label>
-        @Html.DropDownListFor(model => model.ProductId, new SelectList(" "), "--select Product", new { @class = "form-control" })
-    </div>
+            @Html.DropDownListFor(item => item.simpleinvoice.Product.pr_name, new SelectList(" "), "--select Product", new { @class = "form-control" })
+        </div>
 
-    <div class="form-group">
-        <label>
-            Rate
-        </label>
-        @Html.TextBoxFor(m => m.rate, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        <label>
-            date
-        </label>
-        @Html.TextBoxFor(m => m.time, new { @class = "form-control" })
-    </div>
-          
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <input id="submit-btn" type="submit" value="Save" class="btn btn-success" />
+        <div class="form-group">
+            <label>
+                Rate
+            </label>
+            @Html.TextBoxFor(item => item.simpleinvoice.rate, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>
+                quantity
+            </label>
+            @Html.TextBoxFor(item => item.simpleinvoice.quantity, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input id="submit-btn" type="submit" value="Save" class="btn btn-success" />
+            </div>
         </div>
     </div>
-</div> 
 }
+@{ int sum = 0; }
 
+@*Dispaly a particular invoice data*@
+<table class="table">
+    <thead>
+        <tr>
+            <th>PartyName</th>
+            <th>ProductName</th>
+            <th>Rate</th>
+            <th>Quantity</th>
+            <th>total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.listinvoice != null)
+        {
+            foreach (var item in Model.listinvoice)
+            {
 
+                int ans = Convert.ToInt32(item.rate) * Convert.ToInt32(item.quantity);
 
-@*Display Invoice List*@
-    <div>
-        @Html.ActionLink("DisplayInvoice", "DisplayInvoice")
-    </div>
+                <tr>
+                    <td>@item.Party.p_name</td>
+                    <td>@item.Product.pr_name</td>
+                    <td>@item.rate</td>
+                    <td>@item.quantity</td>
+                    <td>@ans</td>
+                </tr>
 
+                sum += ans;
+            }
+        }
+    </tbody>
+</table>
+<br />
+<div class="align-items-right"> <b>Grand Total : @sum</b></div>
+
+<br />
+@using (Html.BeginForm("Close", "Invoice"))
+{
+    <input id="submit-btn" type="submit" value="Close" class="btn btn-danger" />
+}
 
 
 <script src="~/Scripts/jquery-3.4.1.min.js"></script>
 @*For Rendering on party change data*@
+
+
 <script>
-    $(document).ready(function () {
-        $("#PartyId").change(function () {
-            $.get("/Invoice/ProductList", { id: $("#PartyId").val() }, function (data) {
-                $("#ProductId").empty();
-                $("#ProductId").append("<option value=--Select Party-->Select</option");
-                $.each(data, function (index, row) {
-                    $("#ProductId").append("<option value='" + row.id + "'>" + row.pr_name + "</option>")
+        $(document).ready(function () {
+            $("#simpleinvoice_Party_p_name").change(function () {
+                $.get("/Invoice/ProductList", { id: $("#simpleinvoice_Party_p_name").val() }, function (data) {
+                    $("#simpleinvoice_Product_pr_name").empty();
+                    $("#simpleinvoice_Product_pr_name").append("<option value=--Select Party-->Select</option");
+                    $.each(data, function (index, row) {
+                        $("#simpleinvoice_Product_pr_name").append("<option value='" + row.id + "'>" + row.pr_name + "</option>")
+                    })
                 })
             })
-        })
-@*Rendering on product change data*@
-        $("#ProductId").change(function () {
-            $.get("/Invoice/Rate", { id: $("#ProductId").val() }, function (data) {
-                $("#rate").empty();
-                $("#rate").val(data);
-            })
-        })
-        $("#submit-btn").click(function () {
-            $.get("/Invoice/ViewInvoice", function (data) {
-                console.log(data);
+
+@*Rendering on product change data *@
+            $("#simpleinvoice_Product_pr_name").change(function () {
+                $.get("/Invoice/Rate", { id: $("#simpleinvoice_Product_pr_name").val() }, function (data) {
+                    $("#simpleinvoice_rate").empty();
+                    $("#simpleinvoice_rate").val(data);
             })
         })
     })

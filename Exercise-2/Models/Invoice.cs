@@ -12,15 +12,8 @@ namespace Exercise_2.Models
         [Key]
         public int id { get; set; }
         public Party Party { get; set; }
-        [Required]
-        [ForeignKey("Party")]
-        public int PartyId { get; set; }
         public Product Product { get; set; }
-        [Required]
-        [ForeignKey("Product")]
-        
-        public int ProductId { get; set; }
         public int rate  { get; set; }
-        public DateTime time { get; set; }
+        public int quantity { get; set; }
     }
 }
